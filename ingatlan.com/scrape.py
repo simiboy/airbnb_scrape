@@ -114,7 +114,7 @@ def is_cloudflare_challenge():
         return True
     return False
 
-# --- SIMULATE HUMAN SCROLLING ---
+# --- SIMULATE HUMAN SCROLLING (ONLY ON NORMAL PAGES) ---
 def simulate_browsing_behavior():
     try:
         for _ in range(random.randint(3, 7)):  # more scrolls
@@ -124,7 +124,7 @@ def simulate_browsing_behavior():
     except Exception:
         pass
 
-# --- HANDLE CLOUDFLARE (exponential backoff) ---
+# --- HANDLE CLOUDFLARE (exponential backoff, NO SCROLL/MOUSE) ---
 def handle_cloudflare(page_number, max_retries=5):
     retry = 0
     backoff = 5
@@ -155,7 +155,9 @@ def scrape_page(page_number):
     if not cookies_accepted:
         accept_cookies()
 
-    simulate_browsing_behavior()
+    # Only simulate browsing if NOT blocked by Cloudflare
+    if not is_cloudflare_challenge():
+        simulate_browsing_behavior()
 
     if page_number == 1:
         set_max_pages()
