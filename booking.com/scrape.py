@@ -11,7 +11,7 @@ from datetime import date, timedelta, datetime
 
 
 # --- CONFIG ---
-OUTPUT_DIR = "booking_data"
+OUTPUT_DIR = "data"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{date.today()}.csv")
 
