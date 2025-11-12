@@ -17,73 +17,11 @@ th { background-color: #f4f4f4; }
 <table>
 <thead>
 <tr>
-<th>Week</th>
-<th>Booking.com</th>
-<th>Ingatlan.com</th>
-</tr>
-</thead>
-<tbody id="tracker-body">
+<th>Week</th><th>Booking.com</th><th>Ingatlan.com</th></tr></thead>
+<tbody>
+<tr><td>2025-W46</td><td class='done'>✓</td><td class='not-done'>✗</td></tr>
+<tr><td>2025-W45</td><td class='done'>✓</td><td class='not-done'>✗</td></tr>
 </tbody>
 </table>
-
-<script>
-// List of all CSV files in the directories (manually updated or pre-generated)
-const files = {
-    "booking.com": [
-        "2025-11-07.csv",
-        "2025-11-05.csv",
-        "2025-10-30.csv"
-    ],
-    "ingatlan.com": [
-        "2025-11-07.csv",
-        "2025-10-29.csv"
-    ]
-};
-
-// Helper to get ISO week number correctly
-function getISOWeek(date) {
-    const tmpDate = new Date(date.valueOf());
-    const dayNr = (date.getDay() + 6) % 7; // Monday=0, Sunday=6
-    tmpDate.setDate(tmpDate.getDate() - dayNr + 3);
-    const firstThursday = new Date(tmpDate.getFullYear(), 0, 4);
-    const diff = tmpDate - firstThursday;
-    const week = 1 + Math.round(diff / (7 * 24 * 60 * 60 * 1000));
-    return week;
-}
-
-function getWeekKey(filename) {
-    const dateStr = filename.replace(".csv", "");
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const week = getISOWeek(date);
-    return `${year}-W${week.toString().padStart(2,"0")}`;
-}
-
-// Collect all weeks
-let allWeeks = new Set();
-for (const project in files) {
-    files[project].forEach(f => allWeeks.add(getWeekKey(f)));
-}
-allWeeks = Array.from(allWeeks).sort().reverse(); // newest first
-
-// Render table
-const tbody = document.getElementById("tracker-body");
-allWeeks.forEach(week => {
-    const tr = document.createElement("tr");
-    const tdWeek = document.createElement("td");
-    tdWeek.textContent = week;
-    tr.appendChild(tdWeek);
-
-    for (const project of ["booking.com", "ingatlan.com"]) {
-        const td = document.createElement("td");
-        const done = files[project].some(f => getWeekKey(f) === week);
-        td.textContent = done ? "✓" : "✗";
-        td.className = done ? "done" : "not-done";
-        tr.appendChild(td);
-    }
-
-    tbody.appendChild(tr);
-});
-</script>
 </body>
 </html>
