@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scraping Status Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f9fafb;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 60%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px 15px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #efefef;
+    }
+    .done { color: green; font-weight: bold; }
+    .missing { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Scraping Progress Tracker</h1>
+  <table id="statusTable">
+    <thead>
+      <tr>
+        <th>Week</th>
+        <th>Booking.com</th>
+        <th>Ingatlan.com</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be populated by JavaScript -->
+    </tbody>
+  </table>
+
+  <script>
+    // Configuration
+    const projects = {
+      "Booking.com": "booking.com/data",
+      "Ingatlan.com": "ingatlan.com/data"
+    };
+
+    // Starting Wednesday
+    const START_DATE = new Date("2025-11-05");
+
+    // Get all Wednesdays from 2025-11-05 to today
+    function getWednesdaysFromStart() {
+      const wednesdays = [];
+      const today = new Date();
+      const d = new Date(START_DATE);
+
+      while (d <= today) {
+        wednesdays.push(d.toISOString().slice(0, 10));
+        d.setDate(d.getDate() + 7); // jump 1 week
+      }
+
+      // newest first
+      return wednesdays.reverse();
+    }
+
+    // Check if a file exists
+    async function fileExists(path) {
+      try {
+        const response = await fetch(path);
+        return response.ok;
+      } catch {
+        return false;
+      }
+    }
+
+    async function buildTable() {
+      const tableBody = document.querySelector("#statusTable tbody");
+      const weeks = getWednesdaysFromStart();
+
+      for (const week of weeks) {
+        const row = document.createElement("tr");
+
+        const weekCell = document.createElement("td");
+        weekCell.textContent = week;
+        row.appendChild(weekCell);
+
+        for (const [name, path] of Object.entries(projects)) {
+          const cell = document.createElement("td");
+          const filePath = `${path}/${week}.csv`;
+          const exists = await fileExists(filePath);
+          cell.innerHTML = exists
+            ? '<span class="done">✅</span>'
+            : '<span class="missing">❌</span>';
+          row.appendChild(cell);
+        }
+
+        tableBody.appendChild(row);
+      }
+    }
+
+    buildTable();
+  </script>
+</body>
+</html>
